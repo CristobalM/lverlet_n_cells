@@ -5,10 +5,10 @@ class Grid:
     def __init__(self, wall, rv):
         self.wall = wall
         self.rv = rv
-        self.rows = int(wall.getHeight() / rv)
-        self.cols = int(wall.getWidth() / rv)
-        self.deltax = wall.getWidth() / self.cols
-        self.deltay = wall.getHeight() / self.rows
+        self.rows = int(wall.get_height() / rv)
+        self.cols = int(wall.get_width() / rv)
+        self.deltax = wall.get_width() / self.cols
+        self.deltay = wall.get_height() / self.rows
         self.grid = None
         self.create_grid()
 
@@ -22,8 +22,8 @@ class Grid:
 
     def get_i_j_from_pos(self, position):
         [x, y] = position
-        j = int((x-self.wall.getXMin())/self.deltax)
-        i = int((y-self.wall.getYMin())/self.deltay)
+        j = int((x - self.wall.get_xmin()) / self.deltax)
+        i = int((y - self.wall.get_ymin()) / self.deltay)
         return i, j
 
     def add_to_grid(self, idx, position):

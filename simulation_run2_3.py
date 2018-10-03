@@ -4,7 +4,7 @@ import numpy as np
 from src.params import Params
 from src.particle_interaction import WCAParticleInteraction
 from src.simulation import Simulation
-from src.wall import WallA
+from src.wall import WallPeriodicBC
 
 sim_steps = 1000
 epsilon = 1
@@ -16,10 +16,10 @@ ymin = 0.0
 ymax = 1000.0
 
 interaction = WCAParticleInteraction(epsilon, sigma)
-wall = WallA(xmin, xmax, ymin, ymax)
+wall = WallPeriodicBC(xmin, xmax, ymin, ymax)
 
-X_u = np.linspace(xmin +0.1, xmax-0.1, 30)
-Y_u = np.linspace(ymin +0.1, ymax-0.1, 30)
+X_u = np.linspace(xmin +0.1, xmax-0.1, 2)
+Y_u = np.linspace(ymin +0.1, ymax-0.1, 1)
 XX, YY= np.meshgrid(X_u, Y_u)
 
 pts = np.vstack([XX.ravel(), YY.ravel()])
@@ -46,7 +46,8 @@ for result in sim.run_gen():
     Xr, Yr = zip(*result)
     results.append([Xr, Yr])
 
-pause_step = 1.0/25.0 # 25 fps
+
+pause_step = 1.0/25.0#0.05
 plt.figure(figsize=(15, 15))
 for i, result in enumerate(results):
     #plt.gcf().clear()

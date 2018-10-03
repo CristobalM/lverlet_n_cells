@@ -1,6 +1,9 @@
-from grid import Grid
-import scipy.linalg as splalg
 import time
+
+import scipy.linalg as splalg
+
+from src.grid import Grid
+
 
 class ParticleHandler:
     def __init__(self, idx, particles_positions, wall, grid, params):

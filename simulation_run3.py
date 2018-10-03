@@ -1,10 +1,10 @@
-from params import Params
-from particle_interaction import WCAParticleInteraction
-from simulation import Simulation
-from wall import WallA
 import matplotlib.pyplot as plt
-
 import numpy as np
+
+from src.params import Params
+from src.particle_interaction import WCAParticleInteraction
+from src.simulation import Simulation
+from src.wall import WallA
 
 sim_steps = 10
 epsilon = 1
@@ -40,7 +40,7 @@ times = []
 for lambd in the_lambdas:
     #lambd = 0.2
     rv = (1+lambd)*rc
-    params = Params(rc=rc, rv=rv, v0=v0, mu=mu, deltat=deltat, DiffCoef=diffcoef)
+    params = Params(rc=rc, rv=rv, v0=v0, mu=mu, deltat=deltat, diffcoef=diffcoef, epsilon=epsilon, sigma=sigma)
 
     sim = Simulation(sim_steps, interaction, wall, init_positions, params)
     grid_rows = sim.particle_handlers.grid.rows
@@ -57,28 +57,3 @@ plt.ylabel("Tiempo")
 plt.xticks(np.arange(0.0, max_lambda + 0.05, max_lambda/12.0))
 plt.title("Numero de iteraciones: %d, Numero de particulas: %d" % (sim_steps, particles_num))
 plt.show()
-
-"""
-print("Tiempo\t\t\t\t\t\t\t\t\tsegundos")
-print("Total limpiar grilla\t\t\t\t\t%.5f" % sim.acc_ctime)
-if sim.c_ctime > 0:
-    print("Promedio limpiar grilla\t\t\t\t\t%.5f" % float(sim.acc_ctime/sim.c_ctime))
-print("Total asignar en grilla\t\t\t\t\t%.5f" % sim.acc_asstime)
-if sim.c_asstime > 0:
-    print("Promedio asignar en grilla\t\t\t\t%.5f" % float(sim.acc_asstime/sim.c_asstime))
-print("Total crear verlet\t\t\t\t\t\t%.5f" % sim.acc_vtime)
-if sim.c_vtime > 0:
-    print("Promedio crear verlet\t\t\t\t\t%.5f" % float(sim.acc_vtime/sim.c_vtime))
-print("Total ejecucion\t\t\t\t\t\t\t%.5f" % sim.total_time)
-print("Numero de celdas: %d" % (grid_rows*grid_cols))
-
-
-Xr, Yr = zip(*results)
-plt.figure(figsize=(15, 15))
-plt.scatter(Xr, Yr)
-plt.axvline(x=xmin, c='r')
-plt.axvline(x=xmax, c='r')
-plt.axhline(y=ymin, c='r')
-plt.axhline(y=ymax, c='r')
-plt.show()
-"""

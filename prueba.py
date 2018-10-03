@@ -1,7 +1,6 @@
-import itertools
-x = [1, 2, 3, 4, 5]
-y = [6, 7, 8, 9, 10]
-for i in itertools.chain(x, y, iter([])):
-    print(i)
+import numpy as np
 
-print()
+w = 10.0
+x = 501
+next_x = (x + w*(int(np.abs(x)/w)+1)) % w
+print(next_x)

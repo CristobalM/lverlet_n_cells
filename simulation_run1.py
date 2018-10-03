@@ -1,10 +1,10 @@
-from params import Params
-from particle_interaction import WCAParticleInteraction
-from simulation import Simulation
-from wall import WallA
 import matplotlib.pyplot as plt
-
 import numpy as np
+
+from src.params import Params
+from src.particle_interaction import WCAParticleInteraction
+from src.simulation import Simulation
+from src.wall import WallA
 
 sim_steps = 10
 epsilon = 1
@@ -36,7 +36,7 @@ deltat = 0.1
 diffcoef = 1
 
 
-params = Params(rc=rc, rv=rv, v0=v0, mu=mu, deltat=deltat, DiffCoef=diffcoef)
+params = Params(rc=rc, rv=rv, v0=v0, mu=mu, deltat=deltat, diffcoef=diffcoef, epsilon=epsilon, sigma=sigma)
 
 sim = Simulation(sim_steps, interaction, wall, pts3, params)
 grid_rows = sim.particle_handlers.grid.rows

@@ -1,7 +1,10 @@
+import time
+
 import numpy as np
 import scipy.linalg as splalg
-from particle import ParticleHandlers
-import time
+
+from src.particle import ParticleHandlers
+
 
 class Simulation:
     def __init__(self, sim_steps, interactions, wall, init_positions, params, seed=12345):
@@ -96,16 +99,12 @@ class Simulation:
         Fk = np.zeros(2, dtype=float)
         for nb_idx in nbors_idxs:
             nb_pos = self.positions[nb_idx]
-            diff_vec = mypos - nb_pos
-            dist = splalg.norm(diff_vec)
+            diff_vec, dist = self.wall.pairwise_dist(mypos, nb_pos)
             Fk += self.interactions.eval(dist)*(diff_vec/dist)
 
         return Fk
 
     def get_particle_direction(self):
-        next_angle = self.last_angle + np.sqrt(2*self.params.DiffCoef*self.params.deltat) * np.random.normal()
+        next_angle = self.last_angle + np.sqrt(2*self.params.diffcoef*self.params.deltat) * np.random.normal()
         self.last_angle = next_angle
         return np.array([np.cos(next_angle), np.sin(next_angle)])
-
-
-
