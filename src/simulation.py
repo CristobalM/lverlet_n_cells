@@ -18,7 +18,7 @@ class Simulation:
         self.particle_handlers = ParticleHandlers(init_positions, params, wall)
 
         self.sim_results = None
-        self.last_angle = None
+        #self.last_angle = None
         self.acc_ctime = 0.0
         self.acc_asstime = 0.0
         self.acc_vtime = 0.0
@@ -26,6 +26,7 @@ class Simulation:
         self.c_asstime = 0
         self.c_vtime = 0
         self.total_time = 0
+        self.last_angle = np.zeros(len(init_positions), dtype=np.float32)
 
     def run(self):
         tottime = time.time()
@@ -52,7 +53,7 @@ class Simulation:
         self.particle_handlers.create_handlers()
 
         np.random.seed(self.seed)
-        self.last_angle = np.random.random() * 2 * np.pi
+        self.last_angle = np.array([np.random.random() * 2 * np.pi for _ in range(len(self.last_angle))])
 
     def run_step(self):
         interactions_result = self.calc_interactions()
@@ -86,9 +87,9 @@ class Simulation:
         last_position = self.positions[k]
         v0 = self.params.v0
         delta_t = self.params.deltat
-        direction = self.get_particle_direction()
+        direction = self.get_particle_direction(k)
         mu = self.params.mu
-        next_pos = last_position + v0*delta_t*direction - mu*delta_t*interactions_result[k]
+        next_pos = last_position + v0*delta_t*direction + mu*delta_t*interactions_result[k]
         return next_pos
 
     def get_particle_interaction(self, k):
@@ -104,7 +105,7 @@ class Simulation:
 
         return Fk
 
-    def get_particle_direction(self):
-        next_angle = self.last_angle + np.sqrt(2*self.params.diffcoef*self.params.deltat) * np.random.normal()
-        self.last_angle = next_angle
+    def get_particle_direction(self, k):
+        next_angle = self.last_angle[k] + np.sqrt(2*self.params.diffcoef*self.params.deltat) * np.random.normal()
+        self.last_angle[k] = next_angle
         return np.array([np.cos(next_angle), np.sin(next_angle)])

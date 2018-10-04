@@ -11,13 +11,18 @@ epsilon = 1
 sigma = 1
 
 xmin = 0.0
-xmax = 1000.0
+xmax = 10.0
 ymin = 0.0
-ymax = 1000.0
+ymax = 10.0
 
 interaction = WCAParticleInteraction(epsilon, sigma)
 wall = WallA(xmin, xmax, ymin, ymax)
 
+#X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
+#Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
+
+#X_u = [np.random.random()*(xmax-xmin) + xmin for _ in range(2)]
+#Y_u = [np.random.random()*(ymax-ymin) + ymin for _ in range(1)]
 X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
 Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
 XX, YY= np.meshgrid(X_u, Y_u)
@@ -30,9 +35,9 @@ print("Numero de particulas = %d" % len(pts3))
 rc = interaction.get_rc()
 lambd = 0.2
 rv = (1+lambd)*rc
-v0 = 10000
+v0 = 1
 mu = 1
-deltat = 0.01
+deltat = 0.1
 diffcoef = 1
 
 
@@ -47,7 +52,7 @@ for result in sim.run_gen():
     results.append([Xr, Yr])
 
 
-pause_step = 1.0/25.0#0.05
+pause_step = 1.0/30.0#0.05
 plt.figure(figsize=(15, 15))
 for i, result in enumerate(results):
     #plt.gcf().clear()
