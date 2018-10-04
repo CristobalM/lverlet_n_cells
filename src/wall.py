@@ -38,10 +38,9 @@ class Wall:
     def get_xmin(self):
         return self.x_min
 
+    @abstractmethod
     def nbors_indexes(self, i, j, rows, cols):
-        return [(i, j), (i, j + 1), (i, j - 1),
-                (i + 1, j), (i + 1, j + 1), (i + 1, j - 1),
-                (i - 1, j), (i - 1, j + 1), (i - 1, j - 1)]
+        pass
 
 
 class WallA(Wall):
@@ -60,8 +59,22 @@ class WallA(Wall):
 
         return next_x, next_y
 
+    def nbors_indexes(self, i, j, rows, cols):
+        return [(i, j), (i, j + 1), (i, j - 1),
+                (i + 1, j), (i + 1, j + 1), (i + 1, j - 1),
+                (i - 1, j), (i - 1, j + 1), (i - 1, j - 1)]
+
 
 class WallPeriodicBC(Wall):
+    def nbors_indexes(self, i, j, rows, cols):
+        inext = (i+1)%rows
+        iprev = (rows + i-1)%rows
+        jnext = (j+1)%cols
+        jprev = (cols + j - 1) % cols
+        return[(i, j), (i, jnext), (i, jprev),
+              (inext, j), (inext, jnext), (inext, jprev),
+              (iprev, j), (iprev, jnext), (iprev, jprev)]
+
     def next_pos(self, x, y):
         next_x = (x + self.get_width()*(int(np.abs(x)/self.get_width())+1)) % self.get_width()
         next_y = (y + self.get_height()*(int(np.abs(y)/self.get_height())+1)) % self.get_height()

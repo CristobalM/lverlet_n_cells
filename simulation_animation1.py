@@ -4,27 +4,28 @@ import numpy as np
 from src.params import Params
 from src.particle_interaction import WCAParticleInteraction
 from src.simulation import Simulation
-from src.wall import WallA
+from src.wall import WallA, WallPeriodicBC
 
-sim_steps = 1000
+sim_steps = 100
 epsilon = 1
 sigma = 1
 
 xmin = 0.0
-xmax = 10.0
+xmax = 1000.0
 ymin = 0.0
-ymax = 10.0
+ymax = 1000.0
 
 interaction = WCAParticleInteraction(epsilon, sigma)
 wall = WallA(xmin, xmax, ymin, ymax)
+#wall = WallPeriodicBC(xmin, xmax, ymin, ymax)
 
 #X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
 #Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
 
 #X_u = [np.random.random()*(xmax-xmin) + xmin for _ in range(2)]
 #Y_u = [np.random.random()*(ymax-ymin) + ymin for _ in range(1)]
-X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
-Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
+X_u = np.linspace(xmin +0.1, xmax-0.1, 100)
+Y_u = np.linspace(ymin +0.1, ymax-0.1, 100)
 XX, YY= np.meshgrid(X_u, Y_u)
 
 pts = np.vstack([XX.ravel(), YY.ravel()])
@@ -47,10 +48,15 @@ sim = Simulation(sim_steps, interaction, wall, pts3, params)
 grid_rows = sim.particle_handlers.grid.rows
 grid_cols = sim.particle_handlers.grid.cols
 results = []
+cnt = 0
 for result in sim.run_gen():
     Xr, Yr = zip(*result)
+    cnt += 1
     results.append([Xr, Yr])
+    if cnt % 10 == 0:
+        print("%d/%d" % (cnt, sim_steps))
 
+print("Verlet changes: %d" % sim.verlet_changes)
 
 pause_step = 1.0/30.0#0.05
 plt.figure(figsize=(15, 15))

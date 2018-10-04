@@ -12,21 +12,28 @@ class Simulation:
         self.interactions = interactions
         self.wall = wall
         self.positions = init_positions
+        self.positions_verlet_snapshot = np.copy(self.positions)
         self.seed = seed
         self.params = params
 
         self.particle_handlers = ParticleHandlers(init_positions, params, wall)
 
         self.sim_results = None
-        #self.last_angle = None
+        self.last_angle = None
+
         self.acc_ctime = 0.0
         self.acc_asstime = 0.0
         self.acc_vtime = 0.0
+        self.acc_interaction_time = 0.0
+        self.acc_calc_step_time = 0.0
         self.c_ctime = 0
         self.c_asstime = 0
         self.c_vtime = 0
+
         self.total_time = 0
+
         self.last_angle = np.zeros(len(init_positions), dtype=np.float32)
+        self.verlet_changes = 0
 
     def run(self):
         tottime = time.time()
@@ -53,17 +60,22 @@ class Simulation:
         self.particle_handlers.create_handlers()
 
         np.random.seed(self.seed)
-        self.last_angle = np.array([np.random.random() * 2 * np.pi for _ in range(len(self.last_angle))])
+        self.last_angle = np.array([np.random.random() * 2 * np.pi for _ in range(len(self.positions))])
 
     def run_step(self):
+        int_time = time.time()
         interactions_result = self.calc_interactions()
+        self.acc_interaction_time += time.time() - int_time
         max_dist = 0
+        init_step_time = time.time()
         for k in range(len(self.positions)):
             next_pos = self.next_position(k, interactions_result)
-            dist_moved = splalg.norm(self.positions[k] - next_pos)
+            _, dist_moved = self.wall.pairwise_dist(self.positions_verlet_snapshot[k], next_pos)  #  splalg.norm(self.positions_verlet_snapshot[k] - next_pos)
             if dist_moved > max_dist:
                 max_dist = dist_moved
             self.positions[k] = self.wall.next_pos(next_pos[0], next_pos[1])
+
+        self.acc_calc_step_time += time.time() - init_step_time
 
         ctime, asstime = self.particle_handlers.create_grid()
         self.acc_ctime += ctime
@@ -71,9 +83,11 @@ class Simulation:
         self.acc_asstime += asstime
         self.c_asstime += 1
         if max_dist > self.params.rv - self.params.rc:
+            self.positions_verlet_snapshot = np.copy(self.positions)
             vtime = self.particle_handlers.calc_verlet_lists()
             self.acc_vtime += vtime
             self.c_vtime += 1
+            self.verlet_changes += 1
 
     def calc_interactions(self):
         interactions_result = []

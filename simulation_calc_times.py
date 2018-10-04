@@ -6,7 +6,7 @@ from src.particle_interaction import WCAParticleInteraction
 from src.simulation import Simulation
 from src.wall import WallA
 
-sim_steps = 10
+sim_steps = 100
 epsilon = 1
 sigma = 1
 
@@ -30,7 +30,7 @@ print("Numero de particulas = %d" % len(pts3))
 rc = interaction.get_rc()
 lambd = 0.2
 rv = (1+lambd)*rc
-v0 = 10000
+v0 = 1
 mu = 1
 deltat = 0.1
 diffcoef = 1
@@ -45,16 +45,24 @@ results = sim.run()
 
 print("Tiempo\t\t\t\t\t\t\t\t\tsegundos")
 print("Total limpiar grilla\t\t\t\t\t%.5f" % sim.acc_ctime)
+print("Total asignar en grilla\t\t\t\t\t%.5f" % sim.acc_asstime)
+print("Total crear verlet\t\t\t\t\t\t%.5f" % sim.acc_vtime)
+print("Total calcular interacciones\t\t\t%.5f" % sim.acc_interaction_time)
+print("Total calcular paso\t\t\t\t\t\t%.5f" % sim.acc_calc_step_time)
+print("Total ejecucion\t\t\t\t\t\t\t%.5f" % sim.total_time)
+
 if sim.c_ctime > 0:
     print("Promedio limpiar grilla\t\t\t\t\t%.5f" % float(sim.acc_ctime/sim.c_ctime))
-print("Total asignar en grilla\t\t\t\t\t%.5f" % sim.acc_asstime)
 if sim.c_asstime > 0:
     print("Promedio asignar en grilla\t\t\t\t%.5f" % float(sim.acc_asstime/sim.c_asstime))
-print("Total crear verlet\t\t\t\t\t\t%.5f" % sim.acc_vtime)
 if sim.c_vtime > 0:
     print("Promedio crear verlet\t\t\t\t\t%.5f" % float(sim.acc_vtime/sim.c_vtime))
-print("Total ejecucion\t\t\t\t\t\t\t%.5f" % sim.total_time)
-print("Numero de celdas: %d" % (grid_rows*grid_cols))
+if sim_steps > 0:
+    print("Promedio calcular interacciones\t\t\t%.5f" % float(sim.acc_interaction_time / sim_steps))
+if sim_steps > 0:
+    print("Promedio calcular paso\t\t\t\t\t%.5f" % float(sim.acc_calc_step_time / sim_steps))
+print("Numero de celdas reales: %d" % (sim.particle_handlers.grid.get_size()))
+print("Numero de celdas virtuales: %d" % (grid_rows*grid_cols))
 
 
 Xr, Yr = zip(*results)

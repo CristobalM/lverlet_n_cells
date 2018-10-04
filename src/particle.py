@@ -25,7 +25,7 @@ class ParticleHandler:
             if nbor_idx == self.idx:
                 continue
             nbor_pos = self.positions[nbor_idx]
-            dist = splalg.norm(nbor_pos - my_pos)
+            _, dist = self.wall.pairwise_dist(nbor_pos, my_pos)
             if dist < self.params.rv:
                 self.neighbors_list.append(nbor_idx)
 

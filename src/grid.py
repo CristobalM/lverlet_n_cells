@@ -14,11 +14,12 @@ class Grid:
 
     def create_grid(self):
         self.grid = {}
-        #for _ in range(self.rows):
-        #    row = []
-        #    for _ in range(self.cols):
-        #        row.append([])
-        #   self.grid.append(row)
+
+    def get_size(self):
+        total = 0
+        for row in self.grid:
+            total += len(self.grid[row])
+        return total
 
     def get_i_j_from_pos(self, position):
         [x, y] = position
@@ -49,7 +50,6 @@ class Grid:
 
     def clear(self):
         self.grid = {}
-
 
 
 def get_if_exists(i, j, grid):
