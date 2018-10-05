@@ -38,11 +38,13 @@ class Grid:
     def get_all_nbors_cells(self, position):
         i, j = self.get_i_j_from_pos(position)
         nbors_it = self.get_nbors_iterator(i, j)
-        return [nbor_idx for nbor_idx in nbors_it]
+        result = [nbor_idx for nbor_idx in nbors_it]
+        return result
 
     def get_nbors_iterator(self, i, j):
-        nbors = [get_if_exists(u, v, self.grid) for u, v in self.nbors_indexes(i, j)]
-        nbors = [u for u in nbors if u is not None]
+
+        nbors = [get_if_exists(u, v, self.rows, self.cols, self.grid) for u, v in self.nbors_indexes(i, j)]
+        nbors = [v for u in nbors if u is not None for v in u]
         return itertools.chain(nbors)
 
     def nbors_indexes(self, i, j):
@@ -52,10 +54,15 @@ class Grid:
         self.grid = {}
 
 
-def get_if_exists(i, j, grid):
-    if i < len(grid) or i >= len(grid):
+def get_if_exists(i, j, rows, cols, grid):
+    if i < 0 or i >= rows:
         return None
-    if j < len(grid[i]) or j >= len(grid[i]):
+    if j < 0 or j >= cols:
         return None
 
-    return grid[i][j]
+    ivec = grid.get(i, None)
+    jvec = None
+    if ivec is not None:
+        jvec = ivec.get(j, None)
+
+    return jvec

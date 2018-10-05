@@ -40,6 +40,7 @@ class Wall:
 
     @abstractmethod
     def nbors_indexes(self, i, j, rows, cols):
+        print("shiii")
         pass
 
 

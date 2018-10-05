@@ -112,10 +112,17 @@ class Simulation:
         handler = self.particle_handlers.get_handler(k)
         nbors_idxs = handler.get_nbors_idxs()
         Fk = np.zeros(2, dtype=float)
+
         for nb_idx in nbors_idxs:
+            if nb_idx == k:
+                continue
             nb_pos = self.positions[nb_idx]
             diff_vec, dist = self.wall.pairwise_dist(mypos, nb_pos)
-            Fk += self.interactions.eval(dist)*(diff_vec/dist)
+            #if dist == 0:
+            #    Fk = 1000*diff_vec
+            #    break
+
+            Fk += (self.interactions.eval(dist)/dist)*diff_vec
 
         return Fk
 
