@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 from src.experiment import MultipleLambdaExperiment
 from src.params import Params, SimulationParams
 from src.wall import WallPeriodicBC
