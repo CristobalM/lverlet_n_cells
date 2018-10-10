@@ -6,7 +6,7 @@ from src.particle_interaction import WCAParticleInteraction
 from src.simulation import Simulation
 from src.wall import WallA
 
-sim_steps = 100
+sim_steps = 10000
 epsilon = 1
 sigma = 1
 

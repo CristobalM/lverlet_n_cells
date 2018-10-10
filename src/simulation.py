@@ -4,6 +4,7 @@ import numpy as np
 import scipy.linalg as splalg
 
 from src.particle import ParticleHandlers
+import progressbar
 
 
 class Simulation:
@@ -34,26 +35,42 @@ class Simulation:
 
         self.last_angle = np.zeros(len(init_positions), dtype=np.float32)
         self.verlet_changes = 0
+        self.measure_threshold = self.sim_steps/100
 
-    def run(self):
-        tottime = time.time()
+    def run(self, show_bar=True):
+        tottime = 0
         self.init_configs()
-        for _ in range(self.sim_steps):
-            self.run_step()
+        with progressbar.ProgressBar(max_value=self.sim_steps) as bar:
+            for n in range(self.sim_steps):
+                if n > self.measure_threshold:
+                    t0 = time.time()
+                self.run_step()
+                if n > self.measure_threshold:
+                    tottime += time.time() - t0
+
+                bar.update(n)
 
         self.sim_results = self.positions
-        self.total_time = time.time() - tottime
+        self.total_time = tottime
         return self.sim_results
 
     def run_gen(self):
-        tottime = time.time()
+        tottime = 0
         self.init_configs()
-        for _ in range(self.sim_steps):
-            self.run_step()
-            yield self.positions
+        with progressbar.ProgressBar(max_value=self.sim_steps) as bar:
+            for n in range(self.sim_steps):
+                if n > self.measure_threshold:
+                    t0 = time.time()
+                self.run_step()
+                if n > self.measure_threshold:
+                    tottime += time.time() - t0
+                bar.update(n)
+
+                yield self.positions
+
 
         self.sim_results = self.positions
-        self.total_time = time.time() - tottime
+        self.total_time = tottime
         return self.sim_results
 
     def init_configs(self):
@@ -118,9 +135,8 @@ class Simulation:
                 continue
             nb_pos = self.positions[nb_idx]
             diff_vec, dist = self.wall.pairwise_dist(mypos, nb_pos)
-            #if dist == 0:
-            #    Fk = 1000*diff_vec
-            #    break
+            if dist == 0:
+                dist = 0.0000001
 
             Fk += (self.interactions.eval(dist)/dist)*diff_vec
 

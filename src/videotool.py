@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+import progressbar
 
 class VideoTool:
     def __init__(self, videofname, window_x_size, window_y_size, real_width, real_height, margin=50):
@@ -56,3 +56,19 @@ class VideoTool:
         #    writer.write(window)
         self.writer.release()
         cv2.destroyAllWindows()
+
+    @staticmethod
+    def generate_video(results, videofname, window_x_size, window_y_size, real_width, real_height, margin=50, rc=2):
+        visual_radius = 2
+        video_tool = VideoTool(videofname, window_x_size, window_y_size,real_width, real_height, margin=margin)
+        rbor = int(rc * min(video_tool.multj, video_tool.multi))
+        with progressbar.ProgressBar(max_value=len(results)) as bar:
+            for n, result in enumerate(results):
+                video_tool.start_window()
+                for x, y in result:
+                    video_tool.add_circle(x, y, visual_radius, visual_radius * 2)
+                    video_tool.add_circle(x, y, rbor, 0, c=(0, 255, 0, 100))
+
+                video_tool.add_frame()
+                bar.update(n)
+        video_tool.create_video()
