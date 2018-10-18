@@ -65,6 +65,9 @@ class WallA(Wall):
                 (i + 1, j), (i + 1, j + 1), (i + 1, j - 1),
                 (i - 1, j), (i - 1, j + 1), (i - 1, j - 1)]
 
+    def name(self):
+        return "WallA"
+
 
 class WallPeriodicBC(Wall):
     def nbors_indexes(self, i, j, rows, cols):
@@ -95,6 +98,9 @@ class WallPeriodicBC(Wall):
         dist = np.sqrt(delta_x**2 + delta_y**2)
         diff_vec = (leftv - rightv)*(dist/np.sqrt(naive_delta_x**2 + naive_delta_y**2))
         return diff_vec, dist
+
+    def name(self):
+        return "WallPeriodicBC"
 
 
 
