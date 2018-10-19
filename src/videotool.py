@@ -68,7 +68,6 @@ class VideoTool:
         j2, i2 = self.get_circle_ji(x2, y2)
         cv2.line(self.current_window, (j1, i1), (j2, i2), color=c)
 
-
     def _draw_cv_line(self, j1, i1, j2, i2, c=(0, 0, 0)):
         cv2.line(self.current_window, (j1, i1), (j2, i2), color=c)
 
@@ -146,25 +145,26 @@ class VideoTool:
                        all_sim_angles=None, all_interactions_list=None, grid=None):
         video_tool = VideoTool(videofname, window_x_size, window_y_size,real_width, real_height, margin=margin)
         final_radius = rc/2.0
-        if grid is not None:
-            for r in range(grid.rows):
-                xg = r * grid.deltax
-                j = video_tool.get_j(xg)
-                video_tool._draw_cv_line(j, 0, j, window_y_size-1, c=(0, 0, 0, 100))
-
-            for c in range(grid.cols):
-                yg = c * grid.deltay
-                i = video_tool.get_i(yg)
-                video_tool._draw_cv_line(0, i, window_x_size-1, i, c=(0, 0, 0, 100))
 
         with progressbar.ProgressBar(max_value=len(results)) as bar:
             for n, result in enumerate(results):
                 video_tool.start_window()
+                if grid is not None:
+                    for c in range(grid.cols):
+                        xg = c * grid.deltax
+                        j = video_tool.get_j(xg)
+                        video_tool._draw_cv_line(j, margin, j, window_y_size - 1 - margin, c=(240, 240, 240))
+
+                    for r in range(grid.rows):
+                        yg = r * grid.deltay
+                        i = video_tool.get_i(yg)
+                        video_tool._draw_cv_line(margin, i, window_x_size - 1 - margin, i, c=(240, 240, 240))
+
                 for k_particle, position in enumerate(result):
                     (x, y) = position
                     video_tool.add_circle(x, y, rc/10, thickness=-1)
                     video_tool.add_circle(x, y, final_radius, c=(0, 255, 0, 100))
-                    #video_tool.add_text(x, y, str(k_particle))
+                    video_tool.add_text(x, y, str(k_particle))
 
                     if all_sim_angles is not None:
                         angle = all_sim_angles[n][k_particle]
@@ -178,9 +178,9 @@ class VideoTool:
                             video_tool.add_line(x, y, other_x, other_y, c=color)
                             video_tool.add_text_between(x, y, other_x, other_y, str(force))
 
-                    if grid is not None:
-                        i, j = grid.get_i_j_from_pos(position)
-                        video_tool.add_text(x, y, "%d, %d" % (i, j), offset=(0,0))
+                    #if grid is not None:
+                    #    i, j = grid.get_i_j_from_pos(position)
+                    #    video_tool.add_text(x, y, "%d, %d" % (i, j), offset=(0,0))
                 video_tool.add_frame()
                 bar.update(n)
         video_tool.create_video()
