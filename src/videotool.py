@@ -31,7 +31,6 @@ class VideoTool:
                       (self.margin, self.margin),
                       (self.virtxsize + self.margin, self.virtysize + self.margin),
                       (255, 0, 0), 2)
-        #self.windows.append(window)
 
     def get_current_window(self):
         return self.windows[-1] if len(self.windows) > 0 else None
@@ -107,6 +106,21 @@ class VideoTool:
                     fontColor,
                     lineType)
 
+    def add_text(self, x, y, text):
+        j, i = self.get_circle_ji(x, y)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        bottomLeftCornerOfText = (j, i)
+        fontScale = 0.5
+        fontColor = (200, 200, 200)
+        lineType = 2
+
+        cv2.putText(self.current_window, text,
+                    bottomLeftCornerOfText,
+                    font,
+                    fontScale,
+                    fontColor,
+                    lineType)
+
     def add_frame(self):
         self.writer.write(self.current_window)
 
@@ -125,6 +139,7 @@ class VideoTool:
                 for k_particle, (x, y) in enumerate(result):
                     video_tool.add_circle(x, y, rc/10, thickness=-1)
                     video_tool.add_circle(x, y, final_radius, c=(0, 255, 0, 100))
+                    video_tool.add_text(x, y, str(k_particle))
 
                     if all_sim_angles is not None:
                         angle = all_sim_angles[n][k_particle]

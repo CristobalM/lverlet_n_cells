@@ -108,10 +108,13 @@ class Simulation:
         init_step_time = time.time()
         for k in range(len(self.positions)):
             next_pos = self.next_position(k, interactions_result)
+            next_pos = self.wall.next_pos(next_pos[0], next_pos[1])
+            self.positions[k] = next_pos
             _, dist_moved = self.wall.pairwise_dist(self.positions_verlet_snapshot[k], next_pos)  #  splalg.norm(self.positions_verlet_snapshot[k] - next_pos)
             if dist_moved > max_dist:
                 max_dist = dist_moved
-            self.positions[k] = self.wall.next_pos(next_pos[0], next_pos[1])
+
+            # Antes se hacia la actualizacion aca...
 
         self.acc_calc_step_time += time.time() - init_step_time
 
