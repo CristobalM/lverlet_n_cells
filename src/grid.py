@@ -24,7 +24,12 @@ class Grid:
     def get_i_j_from_pos(self, position):
         [x, y] = position
         j = int((x - self.wall.get_xmin()) / self.deltax)
+        if j == self.cols:
+            j -= 1
         i = int((y - self.wall.get_ymin()) / self.deltay)
+        if i == self.rows:
+            i -= 1
+        #print("grid: %d, %d, deltax=%.3f, deltay=%.3f" % (i, j, self.deltax, self.deltay))
         return i, j
 
     def add_to_grid(self, idx, position):

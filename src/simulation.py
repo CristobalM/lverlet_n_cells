@@ -123,7 +123,7 @@ class Simulation:
         self.c_ctime += 1
         self.acc_asstime += asstime
         self.c_asstime += 1
-        if max_dist > (self.params.rv - self.params.rc)/10:
+        if max_dist > (self.params.rv - self.params.rc)/2:
             self.positions_verlet_snapshot = np.copy(self.positions)
             vtime = self.particle_handlers.calc_verlet_lists()
             self.acc_vtime += vtime

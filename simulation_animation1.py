@@ -64,4 +64,4 @@ VideoTool.generate_video(results,
                          "output_%dsteps_%.1fx%.1f_%s_%.2f_eps%.4f_v0_%.2f_t_%.3f_allints=%s.avi" %
                          (sim_steps, xmax, ymax, wall.name(), sigma, epsilon, v0, deltat, str(all_interactions)),
                          xsize, ysize, xmax - xmin, ymax - ymin, margin=50, rc=rc, all_sim_angles=all_angles,
-                         all_interactions_list=all_interactions_list)
+                         all_interactions_list=all_interactions_list, grid=sim.particle_handlers.grid)
