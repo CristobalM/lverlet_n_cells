@@ -44,20 +44,24 @@ print("Numero de particulas = %d" % len(pts3))
 
 params = Params(rc=rc, rv=rv, v0=v0, mu=mu, deltat=deltat, diffcoef=diffcoef, epsilon=epsilon, sigma=sigma)
 
-sim = Simulation(sim_steps, interaction, wall, pts3, params, all_interactions=all_interactions)
+sim = Simulation(sim_steps, interaction, wall, pts3, params, all_interactions=all_interactions,
+                 save_interactions_idxs=True, save_point_to_point=True)
 
 xsize = 1024
-ysize = 768
+ysize = 1024
 
 margin = 50
 
 results = []
-angles_all = []
-for result, angles in sim.run_gen():
+all_angles = []
+all_interactions_list = []
+for result, angles, interactions in sim.run_gen():
     results.append(np.copy(result))
-    angles_all.append(np.copy(angles))
+    all_angles.append(np.copy(angles))
+    all_interactions_list.append(np.copy(interactions))
 
 VideoTool.generate_video(results,
                          "output_%dsteps_%.1fx%.1f_%s_%.2f_eps%.4f_v0_%.2f_t_%.3f_allints=%s.avi" %
                          (sim_steps, xmax, ymax, wall.name(), sigma, epsilon, v0, deltat, str(all_interactions)),
-                         xsize, ysize, xmax - xmin, ymax - ymin, margin=50, rc=rc, all_sim_angles=angles_all)
+                         xsize, ysize, xmax - xmin, ymax - ymin, margin=50, rc=rc, all_sim_angles=all_angles,
+                         all_interactions_list=all_interactions_list)

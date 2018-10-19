@@ -13,6 +13,7 @@ class ParticleHandler:
         self.wall = wall
         self.grid = grid
         self.params = params
+        self.the_particle_interaction_values = {}
 
     def get_idx(self):
         return self.idx
