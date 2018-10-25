@@ -6,7 +6,7 @@ from src.simulation import Simulation
 from src.videotool import VideoTool
 from src.wall import WallA, WallPeriodicBC
 
-sim_steps = 3000
+sim_steps = 1000
 epsilon = 0.5
 sigma = 1
 
