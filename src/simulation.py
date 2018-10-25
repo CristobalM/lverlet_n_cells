@@ -41,17 +41,29 @@ class Simulation:
         self.verlet_changes = 0
         self.measure_threshold = self.sim_steps/100
         self.last_interactions = None
+        self.current_delta_t = self.params.deltat
+        self.delta_t_changes = 0
+
+        self.step_angles = None
+        self.step_directions = None
+        #self.valid_step = True
+        self.last_interactions_step = None
 
     def run(self, show_bar=True):
         tottime = 0
         self.init_configs()
         with progressbar.ProgressBar(max_value=self.sim_steps) as bar:
             for n in range(self.sim_steps):
-                if n > self.measure_threshold:
-                    t0 = time.time()
-                self.run_step()
-                if n > self.measure_threshold:
-                    tottime += time.time() - t0
+                valid = False
+                valid_time = 0
+                while not valid:
+                    if n > self.measure_threshold:
+                        t0 = time.time()
+                    valid = self.run_step()
+                    if n > self.measure_threshold:
+                        valid_time = time.time() - t0
+
+                tottime += valid_time
 
                 bar.update(n)
 
@@ -64,11 +76,17 @@ class Simulation:
         self.init_configs()
         with progressbar.ProgressBar(max_value=self.sim_steps) as bar:
             for n in range(self.sim_steps):
-                if n > self.measure_threshold:
-                    t0 = time.time()
-                self.run_step()
-                if n > self.measure_threshold:
-                    tottime += time.time() - t0
+                valid = False
+                valid_time = 0
+                while not valid:
+                    if n > self.measure_threshold:
+                        t0 = time.time()
+                    valid = self.run_step()
+                    if n > self.measure_threshold:
+                        valid_time = time.time() - t0
+
+                tottime += valid_time
+
                 bar.update(n)
 
                 yield self.positions, self.last_angle, self.last_interactions
@@ -78,12 +96,15 @@ class Simulation:
         return self.sim_results, self.last_angle, self.last_interactions
 
     def init_configs(self):
-        self.particle_handlers.create_handlers()
-
         np.random.seed(self.seed)
+
+        self.particle_handlers.create_handlers()
         self.last_angle = np.array([np.random.random() * 2 * np.pi for _ in range(len(self.positions))])
 
-    def get_interactions_idx(self, interactions_values):
+        self.particle_handlers.create_grid()
+        self.particle_handlers.calc_verlet_lists()
+
+    def get_interactions_idx(self):
         result = []
         for k in range(len(self.positions)):
             handler = self.particle_handlers.get_handler(k)
@@ -96,27 +117,67 @@ class Simulation:
         self.last_interactions = result
         return result
 
+    def get_step_angles(self):
+        if self.step_angles is None:
+            self.step_angles = np.zeros(len(self.positions))
+            for k in range(len(self.positions)):
+                self.step_angles[k] = self.get_particle_angle(k)
+                #directions = [self.get_particle_direction(k) for k in range(len(self.positions))]
+
+        return self.step_angles
+
+    def get_step_directions(self):
+        if self.step_directions is None:
+            angles = self.get_step_angles()
+            self.step_directions = [np.array([np.cos(angle), np.sin(angle)]) for angle in angles]
+
+        return self.step_directions
+
+    def get_interactions(self):
+        if self.last_interactions_step is None:
+            self.last_interactions_step = self.calc_interactions()
+
+        return self.last_interactions_step
+
     def run_step(self):
         int_time = time.time()
-        interactions_result = self.calc_interactions()
+        interactions_result = self.get_interactions()#self.calc_interactions()
 
         if self.save_interactions_idxs:
-            self.get_interactions_idx(interactions_result)
+            self.get_interactions_idx()
 
         self.acc_interaction_time += time.time() - int_time
         max_dist = 0
+        max_dist_step = 0
         init_step_time = time.time()
+        next_positions = np.copy(self.positions)
+        directions = self.get_step_directions()
+
         for k in range(len(self.positions)):
-            next_pos = self.next_position(k, interactions_result)
+            next_pos = self.next_position(k, interactions_result, directions)
             next_pos = self.wall.next_pos(next_pos[0], next_pos[1])
-            self.positions[k] = next_pos
-            _, dist_moved = self.wall.pairwise_dist(self.positions_verlet_snapshot[k], next_pos)  #  splalg.norm(self.positions_verlet_snapshot[k] - next_pos)
+            #self.positions[k] = next_pos
+            next_positions[k] = next_pos
+            _, dist_moved = self.wall.pairwise_dist(self.positions_verlet_snapshot[k], next_pos)
+            _, dist_moved_step = self.wall.pairwise_dist(self.positions[k], next_pos)
             if dist_moved > max_dist:
                 max_dist = dist_moved
+            if dist_moved_step > max_dist_step:
+                max_dist_step = dist_moved_step
 
             # Antes se hacia la actualizacion aca...
 
         self.acc_calc_step_time += time.time() - init_step_time
+
+        if max_dist_step > self.params.rc / 10:
+            self.current_delta_t /= 2
+            self.delta_t_changes += 1
+            return False
+
+        self.positions = next_positions
+        self.update_last_angles(self.step_angles)
+        self.renew_step_angles()
+        self.last_interactions_step = None
 
         ctime, asstime = self.particle_handlers.create_grid()
         self.acc_ctime += ctime
@@ -130,6 +191,8 @@ class Simulation:
             self.c_vtime += 1
             self.verlet_changes += 1
 
+        return True
+
     def calc_interactions(self):
         interactions_result = []
         for k in range(len(self.positions)):
@@ -139,11 +202,11 @@ class Simulation:
 
         return interactions_result
 
-    def next_position(self, k, interactions_result):
+    def next_position(self, k, interactions_result, directions):
         last_position = self.positions[k]
         v0 = self.params.v0
-        delta_t = self.params.deltat
-        direction = self.get_particle_direction(k)
+        delta_t = self.current_delta_t
+        direction = directions[k]#self.get_particle_direction(k)
         mu = self.params.mu
         next_pos = last_position + v0*delta_t*direction + mu*delta_t*interactions_result[k]
         return next_pos
@@ -154,6 +217,9 @@ class Simulation:
         handler = self.particle_handlers.get_handler(k)
         nbors_idxs = handler.get_nbors_idxs()
         Fk = np.zeros(2, dtype=float)
+
+        if len(nbors_idxs) > 0:
+            print(">0 nbros dindex¡")
 
         if all_interactions:
             comparing_to = range(len(handler.positions))
@@ -176,6 +242,20 @@ class Simulation:
         return Fk
 
     def get_particle_direction(self, k):
-        next_angle = self.last_angle[k] + np.sqrt(2*self.params.diffcoef*self.params.deltat) * np.random.normal()
-        self.last_angle[k] = next_angle
-        return np.array([np.cos(next_angle), np.sin(next_angle)])
+        next_angle = self.get_particle_angle(k)#self.last_angle[k] + np.sqrt(2*self.params.diffcoef*self.params.deltat) * np.random.normal()
+        #self.last_angle[k] = next_angle
+        return np.array([np.cos(next_angle), np.sin(next_angle)]), next_angle
+
+    def get_particle_angle(self, k):
+        return self.last_angle[k] + np.sqrt(2*self.params.diffcoef*self.current_delta_t) * np.random.normal()
+
+    def update_last_angles(self, angles):
+        self.last_angle = angles
+
+    def update_step_angles(self, angles):
+        self.step_angles = angles
+        self.step_directions = None
+
+    def renew_step_angles(self):
+        self.step_angles = None
+        self.step_directions = None
