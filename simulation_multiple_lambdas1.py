@@ -9,30 +9,45 @@ from src.wall import WallA
 import progressbar
 import os
 
-sim_steps = 200
-epsilon = 1
+sim_steps = 1000
+epsilon = 0.5
 sigma = 1
 
 xmin = 0.0
-xmax = 350.0
+xmax = 15.0
 ymin = 0.0
-ymax = 350.0
+ymax = 15.0
 
+lambd = 0.2
 v0 = 1
 mu = 1
-deltat = 0.1
+#deltat = 0.005
+deltat = 0.01
+#deltat = 0.1
 diffcoef = 1
+
+all_interactions = False
 
 interaction = WCAParticleInteraction(epsilon, sigma)
 rc = interaction.get_rc()
+rv = (1+lambd)*rc
 
 wall = WallA(xmin, xmax, ymin, ymax)
+#wall = WallPeriodicBC(xmin, xmax, ymin, ymax)
 
-X_u = np.linspace(xmin +0.1, xmax-0.1, 100)
-Y_u = np.linspace(ymin +0.1, ymax-0.1, 100)
+X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
+Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
 XX, YY= np.meshgrid(X_u, Y_u)
 
-pts = np.vstack([XX.ravel(), YY.ravel()])
+#pts = np.vstack([XX.ravel(), YY.ravel()])
+#pts3 = np.column_stack([XX.ravel(), YY.ravel()])
+
+
+
+#params = Params(rc=rc, rv=rv, v0=v0, mu=mu, deltat=deltat, diffcoef=diffcoef, epsilon=epsilon, sigma=sigma)
+
+#sim = Simulation(sim_steps, interaction, wall, pts3, params, all_interactions=all_interactions,
+#                 save_interactions_idxs=True, save_point_to_point=True)
 """
 
 pts = np.vstack([XX.ravel(), YY.ravel()])
@@ -41,7 +56,7 @@ init_positions = np.column_stack([XX.ravel(), YY.ravel()])
 particles_num = len(init_positions)
 print("Numero de particulas = %d" % particles_num)
 
-max_lambda = 4#min(xmax, ymax)/rc - 1
+max_lambda = 4.2#min(xmax, ymax)/rc - 1
 
 saved_fname = 'saved_performance_time_lambdas_%d_%d_%.3f.npy' % (sim_steps, particles_num, max_lambda)
 if os.path.isfile(saved_fname):
@@ -49,7 +64,7 @@ if os.path.isfile(saved_fname):
     the_lambdas = both[0]
     times = both[1]
 else:
-    the_lambdas = np.linspace(0.2, max_lambda, 30)
+    the_lambdas = np.linspace(0.1, max_lambda, 7)
     times = []
     #with progressbar.ProgressBar(max_value=len(the_lambdas)) as bar:
     for n, lambd in enumerate(the_lambdas):

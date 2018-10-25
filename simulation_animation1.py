@@ -6,14 +6,14 @@ from src.simulation import Simulation
 from src.videotool import VideoTool
 from src.wall import WallA, WallPeriodicBC
 
-sim_steps = 1000
+sim_steps = 3000
 epsilon = 0.5
 sigma = 1
 
 xmin = 0.0
-xmax = 10.0
+xmax = 5.0
 ymin = 0.0
-ymax = 10.0
+ymax = 5.0
 
 lambd = 0.2
 v0 = 1
@@ -66,5 +66,6 @@ VideoTool.generate_video(results,
                          "output_%dsteps_%.1fx%.1f_%s_%.2f_eps%.4f_v0_%.2f_t_%.3f_allints=%s.avi" %
                          (sim_steps, xmax, ymax, wall.name(), sigma, epsilon, v0, deltat, str(all_interactions)),
                          xsize, ysize, xmax - xmin, ymax - ymin, margin=50, rc=rc, all_sim_angles=all_angles,
-                         all_interactions_list=all_interactions_list, grid=sim.particle_handlers.grid)
+                         all_interactions_list=all_interactions_list, grid=sim.particle_handlers.grid,
+                         draw_force_num=False, draw_interactions=False)
 

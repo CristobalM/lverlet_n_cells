@@ -142,8 +142,9 @@ class VideoTool:
 
     @staticmethod
     def generate_video(results, videofname, window_x_size, window_y_size, real_width, real_height, margin=50, rc=2,
-                       all_sim_angles=None, all_interactions_list=None, grid=None):
-        video_tool = VideoTool(videofname, window_x_size, window_y_size,real_width, real_height, margin=margin)
+                       all_sim_angles=None, all_interactions_list=None, grid=None, draw_force_num=True,
+                       draw_interactions=True, draw_green_border=True):
+        video_tool = VideoTool(videofname, window_x_size, window_y_size, real_width, real_height, margin=margin)
         final_radius = rc/2.0
 
         with progressbar.ProgressBar(max_value=len(results)) as bar:
@@ -163,20 +164,22 @@ class VideoTool:
                 for k_particle, position in enumerate(result):
                     (x, y) = position
                     video_tool.add_circle(x, y, rc/10, thickness=-1)
-                    video_tool.add_circle(x, y, final_radius, c=(0, 255, 0, 100))
+                    if draw_green_border:
+                        video_tool.add_circle(x, y, final_radius, c=(0, 255, 0, 100))
                     video_tool.add_text(x, y, str(k_particle))
 
                     if all_sim_angles is not None:
                         angle = all_sim_angles[n][k_particle]
                         video_tool.add_line_warrow(x, y, angle, np.pi/4, final_radius, c=(255, 0, 0))
 
-                    if all_interactions_list is not None:
+                    if all_interactions_list is not None and draw_interactions:
                         for other_idx, [forcex, forcey] in all_interactions_list[n][k_particle]:
                             [other_x, other_y] = result[other_idx]
                             force = np.round(np.sqrt(forcex**2 + forcey**2), 3)
                             color = (0, 255, 255) if force <= 0.0 else (255, 0, 255)
                             video_tool.add_line(x, y, other_x, other_y, c=color)
-                            video_tool.add_text_between(x, y, other_x, other_y, str(force))
+                            if draw_force_num:
+                                video_tool.add_text_between(x, y, other_x, other_y, str(force))
 
                     #if grid is not None:
                     #    i, j = grid.get_i_j_from_pos(position)

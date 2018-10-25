@@ -139,6 +139,10 @@ class Simulation:
 
         return self.last_interactions_step
 
+    def update_positions(self, new_positions):
+        for k in range(len(self.positions)):
+            self.positions[k] = new_positions[k]
+
     def run_step(self):
         int_time = time.time()
         interactions_result = self.get_interactions()#self.calc_interactions()
@@ -174,7 +178,7 @@ class Simulation:
             self.delta_t_changes += 1
             return False
 
-        self.positions = next_positions
+        self.update_positions(next_positions)
         self.update_last_angles(self.step_angles)
         self.renew_step_angles()
         self.last_interactions_step = None
@@ -217,9 +221,6 @@ class Simulation:
         handler = self.particle_handlers.get_handler(k)
         nbors_idxs = handler.get_nbors_idxs()
         Fk = np.zeros(2, dtype=float)
-
-        if len(nbors_idxs) > 0:
-            print(">0 nbros dindex¡")
 
         if all_interactions:
             comparing_to = range(len(handler.positions))
