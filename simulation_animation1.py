@@ -6,14 +6,14 @@ from src.simulation import Simulation
 from src.videotool import VideoTool
 from src.wall import WallA, WallPeriodicBC
 
-sim_steps = 1000
+sim_steps = 3000
 epsilon = 0.5
 sigma = 1
 
 xmin = 0.0
-xmax = 25.0
+xmax = 5.0
 ymin = 0.0
-ymax = 25.0
+ymax = 5.0
 
 lambd = 0.2
 v0 = 1
@@ -33,9 +33,9 @@ wall = WallA(xmin, xmax, ymin, ymax)
 #wall = WallPeriodicBC(xmin, xmax, ymin, ymax)
 
 #X_u = np.linspace(xmin +2*rc, xmax-2*rc, 5)
-X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
+X_u = np.linspace(xmin +0.1, xmax-0.1, 5)
 #Y_u = np.linspace(ymin +2*rc, ymax-2*rc, 5)
-Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
+Y_u = np.linspace(ymin +0.1, ymax-0.1, 5)
 XX, YY= np.meshgrid(X_u, Y_u)
 
 pts = np.vstack([XX.ravel(), YY.ravel()])
