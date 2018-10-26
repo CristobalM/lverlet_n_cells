@@ -14,11 +14,11 @@ epsilon = 0.5
 sigma = 1
 
 xmin = 0.0
-xmax = 15.0
+xmax = 100.0
 ymin = 0.0
-ymax = 15.0
+ymax = 100.0
 
-lambd = 0.2
+#lambd = 0.2
 v0 = 1
 mu = 1
 #deltat = 0.005
@@ -30,13 +30,13 @@ all_interactions = False
 
 interaction = WCAParticleInteraction(epsilon, sigma)
 rc = interaction.get_rc()
-rv = (1+lambd)*rc
+#rv = (1+lambd)*rc
 
 wall = WallA(xmin, xmax, ymin, ymax)
 #wall = WallPeriodicBC(xmin, xmax, ymin, ymax)
 
-X_u = np.linspace(xmin +0.1, xmax-0.1, 10)
-Y_u = np.linspace(ymin +0.1, ymax-0.1, 10)
+X_u = np.linspace(xmin + 0.1, xmax - 0.1, 32)
+Y_u = np.linspace(ymin + 0.1, ymax - 0.1, 32)
 XX, YY= np.meshgrid(X_u, Y_u)
 
 #pts = np.vstack([XX.ravel(), YY.ravel()])
@@ -56,15 +56,20 @@ init_positions = np.column_stack([XX.ravel(), YY.ravel()])
 particles_num = len(init_positions)
 print("Numero de particulas = %d" % particles_num)
 
-max_lambda = 4.2#min(xmax, ymax)/rc - 1
+max_lambda = 0.2 #min(xmax, ymax)/rc - 1
 
-saved_fname = 'saved_performance_time_lambdas_%d_%d_%.3f.npy' % (sim_steps, particles_num, max_lambda)
+experiment = 2
+
+saved_fname = "saved_performance_time_lambdas_maxlambdas%.2f_%dsteps_%.1fx%.1f_%s_%.2f_eps%.4f_v0_%.2f_t_%.3f_allints=%s_particlesnum%d_exp%d.npy" %\
+              (max_lambda, sim_steps, xmax, ymax, wall.name(), sigma, epsilon, v0, deltat, str(all_interactions), particles_num, experiment)
+
+#saved_fname = 'saved_performance_time_lambdas_%d_%d_%.3f_%.2fx%.2f.npy' % (sim_steps, particles_num, max_lambda, xmax, ymax)
 if os.path.isfile(saved_fname):
     both = np.load(saved_fname)
     the_lambdas = both[0]
     times = both[1]
 else:
-    the_lambdas = np.linspace(0.1, max_lambda, 7)
+    the_lambdas = np.linspace(0.04, max_lambda, 10)
     times = []
     #with progressbar.ProgressBar(max_value=len(the_lambdas)) as bar:
     for n, lambd in enumerate(the_lambdas):
@@ -82,9 +87,10 @@ else:
     times = np.array(times)
     both = np.array([the_lambdas, times])
     np.save(saved_fname, both)
+
 plt.plot(the_lambdas, times)
 plt.xlabel("Lambda")
 plt.ylabel("Tiempo")
-plt.xticks(np.arange(0.0, max_lambda + 0.05, max_lambda/12.0))
+#plt.xticks(np.arange(0.0, max_lambda + 0.05, max_lambda/12.0))
 plt.title("Numero de iteraciones: %d, Numero de particulas: %d" % (sim_steps, particles_num))
 plt.show()
