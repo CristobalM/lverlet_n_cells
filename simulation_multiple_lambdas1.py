@@ -9,7 +9,7 @@ from src.wall import WallA
 import progressbar
 import os
 
-sim_steps = 1000
+sim_steps = 5000
 epsilon = 0.5
 sigma = 1
 
@@ -56,7 +56,7 @@ init_positions = np.column_stack([XX.ravel(), YY.ravel()])
 particles_num = len(init_positions)
 print("Numero de particulas = %d" % particles_num)
 
-max_lambda = 0.2 #min(xmax, ymax)/rc - 1
+max_lambda = 0.3 #min(xmax, ymax)/rc - 1
 
 experiment = 2
 
@@ -69,7 +69,7 @@ if os.path.isfile(saved_fname):
     the_lambdas = both[0]
     times = both[1]
 else:
-    the_lambdas = np.linspace(0.04, max_lambda, 10)
+    the_lambdas = np.linspace(0.04, max_lambda, 50)
     times = []
     #with progressbar.ProgressBar(max_value=len(the_lambdas)) as bar:
     for n, lambd in enumerate(the_lambdas):
