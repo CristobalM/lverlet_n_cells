@@ -166,7 +166,7 @@ class VideoTool:
                     video_tool.add_circle(x, y, rc/10, thickness=-1)
                     if draw_green_border:
                         video_tool.add_circle(x, y, final_radius, c=(0, 255, 0, 100))
-                    video_tool.add_text(x, y, str(k_particle))
+                    #video_tool.add_text(x, y, str(k_particle))
 
                     if all_sim_angles is not None:
                         angle = all_sim_angles[n][k_particle]
