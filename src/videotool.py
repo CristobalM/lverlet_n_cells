@@ -133,6 +133,20 @@ class VideoTool:
                     fontColor,
                     lineType)
 
+    def add_text_window(self, i, j, text, offset=(0, 0)):
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        bottomLeftCornerOfText = (j + offset[0], i + offset[1])
+        fontScale = 0.5
+        fontColor = (100, 100, 100)
+        lineType = 2
+
+        cv2.putText(self.current_window, text,
+                    bottomLeftCornerOfText,
+                    font,
+                    fontScale,
+                    fontColor,
+                    lineType)
+
     def add_frame(self):
         self.writer.write(self.current_window)
 
@@ -143,15 +157,21 @@ class VideoTool:
     @staticmethod
     def generate_video(results, videofname, window_x_size, window_y_size, real_width, real_height, margin=50, rc=2,
                        all_sim_angles=None, all_interactions_list=None, grid=None, draw_force_num=True,
-                       draw_interactions=True, draw_green_border=True, record_step=10):
+                       draw_interactions=True, draw_green_border=True, record_step=10, times=None):
         video_tool = VideoTool(videofname, window_x_size, window_y_size, real_width, real_height, margin=margin)
         final_radius = rc/2.0
+
+        times_pos = int(margin/2)
 
         with progressbar.ProgressBar(max_value=len(results)) as bar:
             for n, result in enumerate(results):
                 if n % record_step != 0:
                     continue
                 video_tool.start_window()
+
+                if times is not None and n < len(times):
+                    video_tool.add_text_window(times_pos, times_pos, "%.2f s" % times[n])
+
                 if grid is not None:
                     for c in range(grid.cols):
                         xg = c * grid.deltax

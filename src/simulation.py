@@ -8,9 +8,11 @@ import progressbar
 
 
 class Simulation:
-    def __init__(self, sim_steps, interactions, wall, init_positions, params, seed=12345, all_interactions=False,
+    def __init__(self, total_phys_time, interactions, wall, init_positions, params, seed=12345, all_interactions=False,
                  save_interactions_idxs=False, save_point_to_point=False):
-        self.sim_steps = sim_steps
+        self.sim_steps_init = np.ceil(total_phys_time / params.deltat)
+        self.total_phys_time = total_phys_time
+        self.total_sim_steps = 0
         self.interactions = interactions
         self.wall = wall
         self.positions = init_positions
@@ -35,11 +37,10 @@ class Simulation:
         self.c_asstime = 0
         self.c_vtime = 0
 
-        self.total_time = 0
 
         self.last_angle = np.zeros(len(init_positions), dtype=np.float32)
         self.verlet_changes = 0
-        self.measure_threshold = self.sim_steps/100
+        self.measure_threshold = 0.0
         self.last_interactions = None
         self.current_delta_t = self.params.deltat
         self.delta_t_changes = 0
@@ -48,51 +49,68 @@ class Simulation:
         self.step_directions = None
         #self.valid_step = True
         self.last_interactions_step = None
+        self.acc_times = []
 
     def run(self, show_bar=True):
         tottime = 0
+        counter = 0
+
         self.init_configs()
-        with progressbar.ProgressBar(max_value=self.sim_steps) as bar:
-            for n in range(self.sim_steps):
+        with progressbar.ProgressBar(max_value=self.total_phys_time) as bar:
+            #for n in range(self.sim_steps_init):
+            acc_time = 0.0
+            while acc_time < self.total_phys_time:
                 valid = False
                 valid_time = 0
                 while not valid:
-                    if n > self.measure_threshold:
+                    if acc_time > self.measure_threshold:
                         t0 = time.time()
                     valid = self.run_step()
-                    if n > self.measure_threshold:
+                    if acc_time > self.measure_threshold:
                         valid_time = time.time() - t0
 
                 tottime += valid_time
+                acc_time += self.current_delta_t
+                self.acc_times.append(acc_time)
+                if acc_time < self.total_phys_time:
+                    bar.update(np.round(acc_time, 2))
 
-                bar.update(n)
+                counter += 1
+
 
         self.sim_results = self.positions
-        self.total_time = tottime
+        self.total_phys_time = tottime
+        self.total_sim_steps = counter
         return self.sim_results
 
     def run_gen(self):
         tottime = 0
         self.init_configs()
-        with progressbar.ProgressBar(max_value=self.sim_steps) as bar:
-            for n in range(self.sim_steps):
+        counter = 0
+        with progressbar.ProgressBar(max_value=self.total_phys_time) as bar:
+            acc_time = 0.0
+            while acc_time < self.total_phys_time:
                 valid = False
                 valid_time = 0
                 while not valid:
-                    if n > self.measure_threshold:
+                    if acc_time > self.measure_threshold:
                         t0 = time.time()
                     valid = self.run_step()
-                    if n > self.measure_threshold:
+                    if acc_time > self.measure_threshold:
                         valid_time = time.time() - t0
 
                 tottime += valid_time
+                acc_time += self.current_delta_t
+                self.acc_times.append(acc_time)
+                if acc_time < self.total_phys_time:
+                    bar.update(np.round(acc_time, 2))
 
-                bar.update(n)
-
+                counter += 1
                 yield self.positions, self.last_angle, self.last_interactions
 
         self.sim_results = self.positions
-        self.total_time = tottime
+        self.total_phys_time = tottime
+        self.total_sim_steps = counter
         return self.sim_results, self.last_angle, self.last_interactions
 
     def init_configs(self):
@@ -103,6 +121,10 @@ class Simulation:
 
         self.particle_handlers.create_grid()
         self.particle_handlers.calc_verlet_lists()
+
+        self.measure_threshold = self.total_phys_time / 10.0
+
+
 
     def get_interactions_idx(self):
         result = []

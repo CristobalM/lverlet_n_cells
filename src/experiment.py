@@ -45,6 +45,6 @@ class MultipleLambdaExperiment(Experiment):
 
             sim = Simulation(sim_steps, interaction, wall, init_positions, params)
             sim.run()
-            times.append(sim.total_time)
+            times.append(sim.total_phys_time)
 
         return the_lambdas, np.array(times)

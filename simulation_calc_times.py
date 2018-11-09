@@ -49,7 +49,7 @@ print("Total asignar en grilla\t\t\t\t\t%.5f" % sim.acc_asstime)
 print("Total crear verlet\t\t\t\t\t\t%.5f" % sim.acc_vtime)
 print("Total calcular interacciones\t\t\t%.5f" % sim.acc_interaction_time)
 print("Total calcular paso\t\t\t\t\t\t%.5f" % sim.acc_calc_step_time)
-print("Total ejecucion\t\t\t\t\t\t\t%.5f" % sim.total_time)
+print("Total ejecucion\t\t\t\t\t\t\t%.5f" % sim.total_phys_time)
 
 if sim.c_ctime > 0:
     print("Promedio limpiar grilla\t\t\t\t\t%.5f" % float(sim.acc_ctime/sim.c_ctime))

@@ -121,7 +121,8 @@ class WallPeriodicBC(Wall):
         diff_vec = (leftv - right_bc)*(dist/np.sqrt(naive_delta_x**2 + naive_delta_y**2))
         return diff_vec, dist
 
-    def name(self):
+    @staticmethod
+    def name():
         return "WallPeriodicBC"
 
 
