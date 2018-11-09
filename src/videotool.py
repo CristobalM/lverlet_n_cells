@@ -123,7 +123,7 @@ class VideoTool:
         font = cv2.FONT_HERSHEY_SIMPLEX
         bottomLeftCornerOfText = (j + offset[0], i + offset[1])
         fontScale = 0.5
-        fontColor = (200, 200, 200)
+        fontColor = (100, 100, 100)
         lineType = 2
 
         cv2.putText(self.current_window, text,
@@ -143,12 +143,14 @@ class VideoTool:
     @staticmethod
     def generate_video(results, videofname, window_x_size, window_y_size, real_width, real_height, margin=50, rc=2,
                        all_sim_angles=None, all_interactions_list=None, grid=None, draw_force_num=True,
-                       draw_interactions=True, draw_green_border=True):
+                       draw_interactions=True, draw_green_border=True, record_step=10):
         video_tool = VideoTool(videofname, window_x_size, window_y_size, real_width, real_height, margin=margin)
         final_radius = rc/2.0
 
         with progressbar.ProgressBar(max_value=len(results)) as bar:
             for n, result in enumerate(results):
+                if n % record_step != 0:
+                    continue
                 video_tool.start_window()
                 if grid is not None:
                     for c in range(grid.cols):
@@ -166,7 +168,7 @@ class VideoTool:
                     video_tool.add_circle(x, y, rc/10, thickness=-1)
                     if draw_green_border:
                         video_tool.add_circle(x, y, final_radius, c=(0, 255, 0, 100))
-                    video_tool.add_text(x, y, str(k_particle))
+                    #video_tool.add_text(x, y, str(k_particle))
 
                     if all_sim_angles is not None:
                         angle = all_sim_angles[n][k_particle]

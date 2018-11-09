@@ -23,10 +23,14 @@ class Grid:
 
     def get_i_j_from_pos(self, position):
         [x, y] = position
-        j = int((x - self.wall.get_xmin()) / self.deltax)
+        real_j = (x - self.wall.get_xmin()) / self.deltax
+        j = int(real_j)
+        dj = real_j - j
         if j == self.cols:
             j -= 1
-        i = int((y - self.wall.get_ymin()) / self.deltay)
+        real_i = (y - self.wall.get_ymin()) / self.deltay
+        i = int(real_i)
+        di = real_i - i
         if i == self.rows:
             i -= 1
         #print("grid: %d, %d, deltax=%.3f, deltay=%.3f" % (i, j, self.deltax, self.deltay))

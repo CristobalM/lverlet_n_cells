@@ -169,8 +169,6 @@ class Simulation:
             if dist_moved_step > max_dist_step:
                 max_dist_step = dist_moved_step
 
-            # Antes se hacia la actualizacion aca...
-
         self.acc_calc_step_time += time.time() - init_step_time
 
         if max_dist_step > self.params.rc / 10:
