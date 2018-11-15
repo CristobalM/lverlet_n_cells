@@ -13,6 +13,7 @@ class Simulation:
         self.sim_steps_init = np.ceil(total_phys_time / params.deltat)
         self.total_phys_time = total_phys_time
         self.total_sim_steps = 0
+        self.total_run_time = 0
         self.interactions = interactions
         self.wall = wall
         self.positions = init_positions
@@ -79,7 +80,8 @@ class Simulation:
 
 
         self.sim_results = self.positions
-        self.total_phys_time = tottime
+        #self.total_phys_time = tottime
+        self.total_run_time = tottime
         self.total_sim_steps = counter
         return self.sim_results
 
@@ -109,7 +111,7 @@ class Simulation:
                 yield self.positions, self.last_angle, self.last_interactions
 
         self.sim_results = self.positions
-        self.total_phys_time = tottime
+        self.total_run_time = tottime
         self.total_sim_steps = counter
         return self.sim_results, self.last_angle, self.last_interactions
 
@@ -123,8 +125,7 @@ class Simulation:
         self.particle_handlers.calc_verlet_lists()
 
         self.measure_threshold = self.total_phys_time / 10.0
-
-
+        self.total_run_time = 0
 
     def get_interactions_idx(self):
         result = []
@@ -132,7 +133,6 @@ class Simulation:
             handler = self.particle_handlers.get_handler(k)
             to_add = []
             nbors_idxs = handler.get_nbors_idxs()
-            #result.append(nbors_idxs)
             for nbor in nbors_idxs:
                 to_add.append((nbor, handler.the_particle_interaction_values.get(nbor)))
             result.append(to_add)

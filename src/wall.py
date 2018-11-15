@@ -106,8 +106,6 @@ class WallPeriodicBC(Wall):
         naive_delta_y = np.abs(diffy)
         delta_x = naive_delta_x
         delta_y = naive_delta_y
-        #delta_x = min(naive_delta_x, self.get_width() - naive_delta_x)
-        #delta_y = min(naive_delta_y, self.get_height() - naive_delta_y)
         right_bc = np.copy(rightv)
         if naive_delta_x > self.get_width()/2:
             delta_x = self.get_width() - naive_delta_x
