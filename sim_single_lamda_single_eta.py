@@ -7,13 +7,15 @@ from src.wall import WallA, WallPeriodicBC
 
 import os
 import sys
+import pickle
 
 assert len(sys.argv) >= 3
 
 lambd = float(sys.argv[1])
 eta = float(sys.argv[2])
+save_results = True if len(sys.argv) >= 4 and int(sys.argv[3]) > 0 else False
 
-total_phys_time = 100
+total_phys_time = 500
 epsilon = 0.5
 sigma = 1
 
@@ -53,8 +55,8 @@ for x in params_tuple:
 
 fname = 'result_' + '_'.join(params_tuple_str) + '_.txt'
 
-X_u = np.linspace(xmin + rc, xmax - rc, particles_x)
-Y_u = np.linspace(ymin + rc, ymax - rc, particles_y)
+X_u = np.linspace(xmin + rc*1.1, xmax - rc*1.1, particles_x)
+Y_u = np.linspace(ymin + rc*1.1, ymax - rc*1.1, particles_y)
 XX, YY = np.meshgrid(X_u, Y_u)
 init_positions = np.column_stack([XX.ravel(), YY.ravel()])
 wall = wall_to_use(xmin, xmax, ymin, ymax)
@@ -69,4 +71,10 @@ results = sim.run()
 sim_time = sim.total_run_time
 
 with open(fname, 'w') as f:
-    f.write(sim_time)
+    f.write(str(sim_time))
+
+
+if save_results:
+    pkfile = fname + '_positions.pkl'
+    with open(pkfile, 'wb') as f:
+        pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
