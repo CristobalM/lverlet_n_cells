@@ -193,7 +193,7 @@ class Simulation:
 
         self.acc_calc_step_time += time.time() - init_step_time
 
-        if max_dist_step > self.params.rc / 10:
+        if max_dist_step > self.params.rc / 3:
             self.current_delta_t /= 2
             self.delta_t_changes += 1
             return False
