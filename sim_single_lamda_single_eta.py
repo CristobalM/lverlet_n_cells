@@ -15,7 +15,7 @@ lambd = float(sys.argv[1])
 eta = float(sys.argv[2])
 save_results = True if len(sys.argv) >= 4 and int(sys.argv[3]) > 0 else False
 
-total_phys_time = 1
+total_phys_time = 500
 epsilon = 0.5
 sigma = 1
 
