@@ -69,8 +69,15 @@ plt.rc('axes', prop_cycle=(cycler('color', ['blue', 'green', 'red',
                                             'salmon', 'gold',
                                             'darkred', 'darkblue'])))
 
+to_plot = []
 
 for eta, values in time_lambda_curves.items():
+    to_plot.append((eta, values))
+
+to_plot.sort()
+
+#for eta, values in time_lambda_curves.items():
+for eta, values in to_plot:
     the_times = values['times']
     the_lambdas = values['lambdas']
 
@@ -79,12 +86,14 @@ for eta, values in time_lambda_curves.items():
     xs = np.array(the_lambdas)[order]
     ys = np.array(the_times)[order]
 
-    plt.plot(xs, ys, label="$\eta = %.1f$" % eta, marker=next(marker), markersize=12)
+    plt.plot(xs, ys, label="$\eta = %.1f$" % eta, marker=next(marker), markersize=15, linewidth=3)
     plt.xticks(np.arange(0.0, 1.4, 0.1))
+    plt.yticks(np.arange(0, 10001, 1000))
     plt.xlabel('$\lambda$', fontsize=18)
     plt.ylabel('Tiempo (s)', fontsize=18)
     plt.title('Tiempo de ejecución del algoritmo de Listas de Verlet\n para un tiempo de simulación físico de 50 segundos', fontsize=22, y=1.02)
 
-plt.legend()
+#plot.legend(loc=2, prop={'size': 6})
+plt.legend(prop={'size': 16})
 plt.grid(alpha=0.5)
 plt.show()
