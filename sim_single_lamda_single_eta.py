@@ -15,7 +15,7 @@ lambd = float(sys.argv[1])
 eta = float(sys.argv[2])
 save_results = True if len(sys.argv) >= 4 and int(sys.argv[3]) > 0 else False
 
-total_phys_time = 1
+total_phys_time = 500
 epsilon = 0.5
 sigma = 1
 
@@ -41,8 +41,8 @@ ymin = 0.0
 wall_to_use = WallPeriodicBC
 
 L = np.sqrt(particles_num/eta)
-xmax = L
-ymax = L
+xmax = L + 10*rc
+ymax = L + 10*rc
 
 
 params_tuple = [lambd, eta, total_phys_time, wall_to_use.name(), sigma, epsilon, v0, deltat, all_interactions, particles_num]
@@ -55,8 +55,8 @@ for x in params_tuple:
 
 fname = 'result_' + '_'.join(params_tuple_str) + '_.txt'
 
-X_u = np.linspace(xmin + rc*1.1, xmax - rc*1.1, particles_x)
-Y_u = np.linspace(ymin + rc*1.1, ymax - rc*1.1, particles_y)
+X_u = np.linspace(xmin + rc*2.0, xmax - rc*2.0, particles_x)
+Y_u = np.linspace(ymin + rc*2.0, ymax - rc*2.0, particles_y)
 XX, YY = np.meshgrid(X_u, Y_u)
 init_positions = np.column_stack([XX.ravel(), YY.ravel()])
 wall = wall_to_use(xmin, xmax, ymin, ymax)

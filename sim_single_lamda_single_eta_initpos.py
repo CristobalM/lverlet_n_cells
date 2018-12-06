@@ -45,8 +45,10 @@ with open(file_init, 'rb') as f:
 particles_num = len(init_positions)
 
 L = np.sqrt(particles_num/eta)
-xmax = L
-ymax = L
+xmax = L + 10*rc
+ymax = L + 10*rc
+
+print("L = %.3f" % L)
 
 
 params_tuple = [lambd, eta, total_phys_time, wall_to_use.name(), sigma, epsilon, v0, deltat, all_interactions, particles_num]
